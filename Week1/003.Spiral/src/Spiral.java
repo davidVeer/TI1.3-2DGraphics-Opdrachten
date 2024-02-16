@@ -29,7 +29,7 @@ public class Spiral extends Application {
         graphics.drawLine(-1000,0,1000,0);
         graphics.setColor(Color.green);
         graphics.drawLine(0,-1000,0,1000);
-        graphics.setColor(Color.black);
+
 
         double resolution = 0.1;
         double scale = 50.0;
