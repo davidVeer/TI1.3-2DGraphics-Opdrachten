@@ -30,9 +30,21 @@ public class Rainbow extends Application {
 
     public void draw(FXGraphics2D graphics)
     {
+        String word = "this is rainbow?";
         graphics.setTransform(new AffineTransform());
         graphics.setBackground(Color.white);
-        graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
+        Font font = new Font("times new roman", Font.ITALIC,60);
+
+        for (int i = 0; i < word.length(); i++) {
+            graphics.setColor(Color.getHSBColor(i/(word.length()/2.0f), 1, 1));
+            Shape shape = font.createGlyphVector(graphics.getFontRenderContext(), word.substring(i,i+1)).getOutline();
+            AffineTransform tx = new AffineTransform();
+            tx.translate(300,200);
+            tx.rotate(Math.toRadians(-100+(180/(word.length() -1.0f)) *i));
+            tx.translate(0,-100);
+            graphics.draw(tx.createTransformedShape(shape));
+        }
+
     }
 
 

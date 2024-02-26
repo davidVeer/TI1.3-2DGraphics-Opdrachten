@@ -135,6 +135,9 @@ public class VerletEngine extends Application {
         if (nearest.getPosition().distance(mousePosition) < 10) {
             mouseConstraint.setParticle(nearest);
         }
+        if (e.isShiftDown()){
+
+        }
     }
 
     private void mouseReleased(MouseEvent e) {
