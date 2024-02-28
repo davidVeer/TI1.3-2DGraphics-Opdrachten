@@ -30,9 +30,18 @@ public class Moon extends Application {
 
     public void draw(FXGraphics2D graphics)
     {
+
+
+        GeneralPath gp = new GeneralPath();
+        gp.moveTo(100.0,100.0);
+        gp.curveTo(350,150,350,450,100,500);
+        gp.curveTo(200,400,200,200,100,100);
+        gp.closePath();
+
         graphics.setTransform(new AffineTransform());
         graphics.setBackground(Color.white);
-        graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
+        graphics.fill(gp);
+
     }
 
 
