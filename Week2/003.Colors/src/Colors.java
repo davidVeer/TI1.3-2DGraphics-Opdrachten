@@ -27,12 +27,36 @@ public class Colors extends Application {
         primaryStage.show();
     }
 
+    public void drawRectangle(int x, int y, int width, int height, Color color, FXGraphics2D graphics2D){
+        graphics2D.setColor(color);
+        graphics2D.fillRect(x,y,width,height);
+    }
 
     public void draw(FXGraphics2D graphics)
     {
         graphics.setTransform(new AffineTransform());
         graphics.setBackground(Color.white);
         graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
+
+        drawRectangle(50 , 100, 50, 50, Color.magenta, graphics);
+        drawRectangle(100 , 100, 50, 50, Color.red, graphics);
+        drawRectangle(150 , 100, 50, 50,  Color.ORANGE, graphics);
+        drawRectangle(200 , 100, 50, 50, Color.YELLOW, graphics);
+        drawRectangle(250 , 100, 50, 50, Color.GREEN, graphics);
+        drawRectangle(300 , 100, 50, 50, Color.CYAN, graphics);
+        drawRectangle(350 , 100, 50, 50, Color.BLUE, graphics);
+        drawRectangle(400 , 100, 50, 50,Color.pink, graphics);
+        drawRectangle(450 , 100, 50, 50, Color.WHITE, graphics);
+        drawRectangle(500 , 100, 50, 50, Color.lightGray, graphics);
+        drawRectangle(550 , 100, 50, 50, Color.gray, graphics);
+        drawRectangle(600 , 100, 50, 50, Color.DARK_GRAY, graphics);
+        drawRectangle(650 , 100, 50, 50, Color.BLACK, graphics);
+
+
+
+
+
+
     }
 
 
