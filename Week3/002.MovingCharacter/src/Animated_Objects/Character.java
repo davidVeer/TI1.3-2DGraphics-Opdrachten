@@ -108,8 +108,8 @@ public class Character implements Animatable {
         else
             try {
                 throw new Exception("this animation doesn't exist for this animatable");
-            }catch (Exception exception){
-                System.out.println(exception.getMessage());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
     }
 

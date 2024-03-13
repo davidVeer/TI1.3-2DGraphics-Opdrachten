@@ -18,7 +18,7 @@ import org.jfree.fx.ResizableCanvas;
 public class MovingCharacter extends Application {
 //    I went way overboard because I wanted to experiment.
 //    not necessarily the most efficient way to do it but this way I can expand with different animated entities, like coins or enemies IDK.
-//    I also didn't follow the exercise quite right because I forgot to properly read it
+//    I also didn't follow the exercise quite right because I forgot to properly read it and I just had fun with it
 
     private ResizableCanvas canvas;
     private Character person;
