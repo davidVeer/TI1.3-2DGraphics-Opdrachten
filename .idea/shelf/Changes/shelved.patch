@@ -1,0 +1,96 @@
+Index: Week3/001.Rainbow/src/Rainbow.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.awt.*;\r\nimport java.awt.geom.*;\r\n\r\nimport javafx.application.Application;\r\n\r\nimport static javafx.application.Application.launch;\r\n\r\nimport javafx.scene.Group;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.layout.BorderPane;\r\nimport javafx.stage.Stage;\r\nimport org.jfree.fx.FXGraphics2D;\r\nimport org.jfree.fx.ResizableCanvas;\r\n\r\npublic class Rainbow extends Application {\r\n    private ResizableCanvas canvas;\r\n\r\n    @Override\r\n    public void start(Stage stage) throws Exception\r\n    {\r\n        BorderPane mainPane = new BorderPane();\r\n        canvas = new ResizableCanvas(g -> draw(g), mainPane);\r\n        mainPane.setCenter(canvas);\r\n        stage.setScene(new Scene(mainPane));\r\n        stage.setTitle(\"Rainbow\");\r\n        stage.show();\r\n        draw(new FXGraphics2D(canvas.getGraphicsContext2D()));\r\n    }\r\n\r\n\r\n    public void draw(FXGraphics2D graphics)\r\n    {\r\n        String word = \"this is rainbow?\";\r\n        graphics.setTransform(new AffineTransform());\r\n        graphics.setBackground(Color.white);\r\n        Font font = new Font(\"times new roman\", Font.ITALIC,60);\r\n\r\n        for (int i = 0; i < word.length(); i++) {\r\n            graphics.setColor(Color.getHSBColor(i/(word.length()/2.0f), 1, 1));\r\n            Shape shape = font.createGlyphVector(graphics.getFontRenderContext(), word.substring(i,i+1)).getOutline();\r\n            AffineTransform tx = new AffineTransform();\r\n            tx.translate(300,200);\r\n            tx.rotate(Math.toRadians(-100+(180/(word.length() -1.0f)) *i));\r\n            tx.translate(0,-100);\r\n            graphics.draw(tx.createTransformedShape(shape));\r\n        }\r\n\r\n    }\r\n\r\n\r\n    public static void main(String[] args)\r\n    {\r\n        launch(Rainbow.class);\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Week3/001.Rainbow/src/Rainbow.java b/Week3/001.Rainbow/src/Rainbow.java
+--- a/Week3/001.Rainbow/src/Rainbow.java	(revision 8819d017e382f37cf653ee724449367f282f46ff)
++++ b/Week3/001.Rainbow/src/Rainbow.java	(date 1709120613265)
+@@ -30,19 +30,19 @@
+ 
+     public void draw(FXGraphics2D graphics)
+     {
+-        String word = "this is rainbow?";
++        String word = "science";
+         graphics.setTransform(new AffineTransform());
+         graphics.setBackground(Color.white);
+         Font font = new Font("times new roman", Font.ITALIC,60);
+ 
+         for (int i = 0; i < word.length(); i++) {
+-            graphics.setColor(Color.getHSBColor(i/(word.length()/2.0f), 1, 1));
++            graphics.setColor(Color.getHSBColor(i/(word.length()/1.6f), 1, 1));
+             Shape shape = font.createGlyphVector(graphics.getFontRenderContext(), word.substring(i,i+1)).getOutline();
+             AffineTransform tx = new AffineTransform();
+             tx.translate(300,200);
+             tx.rotate(Math.toRadians(-100+(180/(word.length() -1.0f)) *i));
+             tx.translate(0,-100);
+-            graphics.draw(tx.createTransformedShape(shape));
++            graphics.fill(tx.createTransformedShape(shape));
+         }
+ 
+     }
+Index: Week2/002.YingYang/src/YingYang.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import java.awt.*;\r\nimport java.awt.geom.*;\r\n\r\nimport javafx.application.Application;\r\n\r\nimport static javafx.application.Application.launch;\r\n\r\nimport javafx.scene.Group;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.layout.BorderPane;\r\nimport javafx.stage.Stage;\r\nimport org.jfree.fx.FXGraphics2D;\r\nimport org.jfree.fx.ResizableCanvas;\r\n\r\npublic class YingYang extends Application {\r\n    private ResizableCanvas canvas;\r\n\r\n    @Override\r\n    public void start(Stage primaryStage) throws Exception\r\n    {\r\n        BorderPane mainPane = new BorderPane();\r\n        canvas = new ResizableCanvas(g -> draw(g), mainPane);\r\n        mainPane.setCenter(canvas);\r\n        primaryStage.setScene(new Scene(mainPane));\r\n        primaryStage.setTitle(\"Ying Yang\");\r\n        primaryStage.show();\r\n        draw(new FXGraphics2D(canvas.getGraphicsContext2D()));\r\n    }\r\n\r\n\r\n    public void draw(FXGraphics2D graphics)\r\n    {\r\n        graphics.setTransform(new AffineTransform());\r\n        graphics.setBackground(Color.white);\r\n        graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());\r\n    }\r\n\r\n\r\n    public static void main(String[] args)\r\n    {\r\n        launch(YingYang.class);\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Week2/002.YingYang/src/YingYang.java b/Week2/002.YingYang/src/YingYang.java
+--- a/Week2/002.YingYang/src/YingYang.java	(revision 8819d017e382f37cf653ee724449367f282f46ff)
++++ b/Week2/002.YingYang/src/YingYang.java	(date 1709133235275)
+@@ -32,7 +32,51 @@
+     {
+         graphics.setTransform(new AffineTransform());
+         graphics.setBackground(Color.white);
+-        graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
++        graphics.fillRect(0,0,100,100);
++
++        Area a = new Area(new Ellipse2D.Double(0,0,100,100));
++        Area b = new Area(new Ellipse2D.Double(50,0,100,100));
++
++        Area added = new Area(a);
++        added.add(b);
++
++        Area sub = new Area(a);
++        sub.subtract(b);
++
++        Area intersect = new Area(a);
++        intersect.intersect(b);
++
++        Area xor = new Area(a);
++        xor.exclusiveOr(b);
++
++        graphics.translate(25,25);
++
++        graphics.setColor(Color.lightGray);
++        graphics.fill(added);
++        graphics.setColor(Color.black);
++        graphics.draw(a);
++        graphics.draw(b);
++
++        graphics.translate(0,150);
++        graphics.setColor(Color.lightGray);
++        graphics.fill(sub);
++        graphics.setColor(Color.black);
++        graphics.draw(a);
++        graphics.draw(b);
++
++        graphics.translate(0,150);
++        graphics.setColor(Color.lightGray);
++        graphics.fill(intersect);
++        graphics.setColor(Color.black);
++        graphics.draw(a);
++        graphics.draw(b);
++
++        graphics.translate(0,150);
++        graphics.setColor(Color.lightGray);
++        graphics.fill(xor);
++        graphics.setColor(Color.black);
++        graphics.draw(a);
++        graphics.draw(b);
+     }
+ 
+ 
