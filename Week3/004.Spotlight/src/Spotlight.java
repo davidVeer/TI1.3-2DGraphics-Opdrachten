@@ -34,8 +34,6 @@ public class Spotlight extends Application {
         canvas = new ResizableCanvas(this::draw, mainPane);
         mainPane.setCenter(canvas);
         FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
-        Rectangle rectangle = new Rectangle(0,0, (int) canvas.getWidth(), (int) canvas.getHeight());
-        g2d.setClip(rectangle);
 
         for (int i = 0; i < 250; i++) {
             colors.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));

@@ -51,6 +51,8 @@ public class Screensaver extends Application {
 
         stage.setScene(new Scene(mainPane));
         stage.setTitle("Screensaver");
+        stage.setMaximized(true);
+        stage.setFullScreen(true);
         stage.show();
         draw(g2d);
     }

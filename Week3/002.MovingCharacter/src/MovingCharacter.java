@@ -77,7 +77,7 @@ public class MovingCharacter extends Application {
 
     public void draw(FXGraphics2D graphics) {
         graphics.setTransform(new AffineTransform());
-        graphics.setBackground(Color.GRAY);
+        graphics.setBackground(Color.BLACK);
         graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
         person.draw(graphics);
     }

@@ -31,7 +31,7 @@ public class BlockDrag extends Application {
         canvas = new ResizableCanvas(g -> draw(g), mainPane);
         mainPane.setCenter(canvas);
 
-        this.myCamera = new MyCamera((int) canvas.getWidth(),(int) canvas.getHeight());
+//        this.myCamera = new MyCamera((int) canvas.getWidth(),(int) canvas.getHeight());
 
         primaryStage.setScene(new Scene(mainPane));
         primaryStage.setTitle("MovableObjects.Block Dragging");
@@ -55,7 +55,7 @@ public class BlockDrag extends Application {
 
     public void draw(FXGraphics2D graphics)
     {
-        graphics.setTransform(myCamera.transform());
+//        graphics.setTransform(myCamera.transform());
         graphics.setColor(Color.white);
         graphics.fill(new Rectangle(-1000, -1000, (int) canvas.getWidth() * 6, (int) canvas.getHeight()*6));
 
@@ -89,13 +89,13 @@ public class BlockDrag extends Application {
             }
         }
         else if (e.isSecondaryButtonDown()) {
-            myCamera.updateLocation(e);
+//            myCamera.updateLocation(e);
         }
     }
 
     public void init(){
         movableObjects = new ArrayList<>();
-        movableObjects.add(new Block(new Point2D.Double(50,50),new Rectangle(0,0,50,50),Color.red,0,1,1));
+        movableObjects.add(new Block(new Point2D.Double(50,50),new Rectangle(0,0,50,50),Color.red,0.1,1,1));
         movableObjects.add(new Block(new Point2D.Double(400,200),new Rectangle(0,0,50,50),Color.orange,0,1,1));
         movableObjects.add(new Block(new Point2D.Double(70,100),new Rectangle(0,0,50,50),Color.green,0,1,1));
         movableObjects.add(new Circle(new Point2D.Double(50,100), new Ellipse2D.Double(0,0,50,50),Color.green,0,1,1));
