@@ -5,9 +5,7 @@ import Constraints.Constraint;
 import Constraints.Particle;
 
 import javax.json.*;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 
@@ -16,7 +14,7 @@ public class FileIO {
     public void save(ArrayList<Particle> particles, ArrayList<Constraint> constraints){
         System.out.println("this should save");
         try {
-            BufferedWriter particleWriter = new BufferedWriter(new FileWriter("saveParticles.txt"));
+            BufferedWriter particleWriter = new BufferedWriter(new FileWriter("Week4/001.Verlet/resources/saveConstraints.txt"));
 
             for (Particle particle : particles) {
                 particleWriter.write("\n" + particle);
@@ -24,7 +22,7 @@ public class FileIO {
 
             particleWriter.close();
 
-            BufferedWriter contraintWriter = new BufferedWriter(new FileWriter("saveConstraints.txt"));
+            BufferedWriter contraintWriter = new BufferedWriter(new FileWriter("Week4/001.Verlet/resources/saveConstraints.txt"));
 
             for (Constraint constraint : constraints) {
                 contraintWriter.write("\n" + constraint);
@@ -49,6 +47,11 @@ public class FileIO {
         System.out.println("this should load constraints");
         ArrayList<Constraint> constraints = new ArrayList<>();
 
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("Week4/001.Verlet/resources/saveConstraints.txt"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         return constraints;
     }
