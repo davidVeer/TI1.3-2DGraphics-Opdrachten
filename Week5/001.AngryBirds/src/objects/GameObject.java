@@ -1,3 +1,4 @@
+package objects;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
@@ -8,10 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-/**
- * Created by johan on 2017-03-08.
- */
-public class GameObject {
+public abstract class GameObject {
 
     private Body body;
     private BufferedImage image;
@@ -43,5 +41,11 @@ public class GameObject {
         tx.translate(-image.getWidth() / 2, -image.getHeight() / 2);
         g2d.drawImage(image, tx, null);
 
+    }
+
+    public abstract void update();
+
+    public Body getBody() {
+        return body;
     }
 }

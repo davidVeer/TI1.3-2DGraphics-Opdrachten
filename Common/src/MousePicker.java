@@ -35,7 +35,7 @@ public class MousePicker {
                 oldMouseClicked.handle(e);
             }
             if (e.getButton() == MouseButton.PRIMARY) {
-                this.mousePos = new Point2D.Double(e.getX(), e.getY());
+                this.mousePos = null;
             }
         });
 

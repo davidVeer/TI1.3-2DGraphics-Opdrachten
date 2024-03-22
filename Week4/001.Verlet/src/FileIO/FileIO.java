@@ -1,10 +1,8 @@
 package FileIO;
 
-
 import Constraints.Constraint;
 import Constraints.Particle;
 
-import javax.json.*;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -46,12 +44,6 @@ public class FileIO {
     public ArrayList<Constraint> loadConstraints(){
         System.out.println("this should load constraints");
         ArrayList<Constraint> constraints = new ArrayList<>();
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("Week4/001.Verlet/resources/saveConstraints.txt"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
 
         return constraints;
     }
