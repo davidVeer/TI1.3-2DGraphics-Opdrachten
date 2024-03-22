@@ -5,15 +5,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import Constraints.*;
+import FileIO.FileIO;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 
 import static javafx.application.Application.launch;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 import org.jfree.fx.ResizableCanvas;
@@ -24,6 +29,7 @@ public class VerletEngine extends Application {
     private ArrayList<Particle> particles = new ArrayList<>();
     private ArrayList<Constraint> constraints = new ArrayList<>();
     private PositionConstraint mouseConstraint = new PositionConstraint(null);
+    private FileIO fileIO;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -31,6 +37,7 @@ public class VerletEngine extends Application {
         canvas = new ResizableCanvas(g -> draw(g), mainPane);
         mainPane.setCenter(canvas);
         FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
+
         new AnimationTimer() {
             long last = -1;
 
@@ -51,6 +58,7 @@ public class VerletEngine extends Application {
         canvas.setOnMouseReleased(e -> mouseReleased(e));
         canvas.setOnMouseDragged(e -> mouseDragged(e));
 
+
         stage.setScene(new Scene(mainPane));
         stage.setTitle("Verlet Engine");
         stage.show();
@@ -58,6 +66,8 @@ public class VerletEngine extends Application {
     }
 
     public void init() {
+        fileIO = new FileIO();
+
         for (int i = 0; i < 20; i++) {
             particles.add(new Particle(new Point2D.Double(100 + 50 * i, 100)));
         }
@@ -71,9 +81,19 @@ public class VerletEngine extends Application {
     }
 
     private void draw(FXGraphics2D graphics) {
+
         graphics.setTransform(new AffineTransform());
         graphics.setBackground(Color.white);
         graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
+
+        Rectangle saveBox = new Rectangle(0, 0, 50, 50);
+        graphics.setColor(Color.green);
+        graphics.fill(saveBox);
+
+        Rectangle loadBox = new Rectangle(50, 0, 50, 50);
+        graphics.setColor(Color.blue);
+        graphics.fill(loadBox);
+
 
         for (Constraint c : constraints) {
             graphics.setColor(Color.BLACK);
@@ -95,8 +115,24 @@ public class VerletEngine extends Application {
         }
     }
 
+    private Particle getNearest(Point2D point) {
+        Particle nearest = particles.get(0);
+        for (Particle p : particles) {
+            if (p.getPosition().distance(point) < nearest.getPosition().distance(point)) {
+                nearest = p;
+            }
+        }
+        return nearest;
+    }
+
     private void mouseClicked(MouseEvent e) {
 
+        if (e.getX() > 0 && e.getX() < 50 && e.getY() > 0 && e.getY() < 50)
+            fileIO.save(particles, constraints);
+        else if (e.getX() > 50 && e.getX() < 100 && e.getY() > 0 && e.getY() < 50) {
+            particles = fileIO.loadParticles();
+            constraints = fileIO.loadConstraints();
+        }
 
         Point2D mousePosition = new Point2D.Double(e.getX(), e.getY());
         Particle nearest = getNearest(mousePosition);
@@ -140,21 +176,15 @@ public class VerletEngine extends Application {
         }
     }
 
-    private Particle getNearest(Point2D point) {
-        Particle nearest = particles.get(0);
-        for (Particle p : particles) {
-            if (p.getPosition().distance(point) < nearest.getPosition().distance(point)) {
-                nearest = p;
-            }
-        }
-        return nearest;
-    }
 
     private void mousePressed(MouseEvent e) {
         Point2D mousePosition = new Point2D.Double(e.getX(), e.getY());
         Particle nearest = getNearest(mousePosition);
         if (nearest.getPosition().distance(mousePosition) < 25) {
-            mouseConstraint.setParticle(nearest);
+            if (e.isControlDown())
+                constraints.add(new PositionConstraint(nearest));
+            else
+                mouseConstraint.setParticle(nearest);
         }
     }
 
