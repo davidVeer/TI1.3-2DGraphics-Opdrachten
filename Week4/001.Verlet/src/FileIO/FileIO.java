@@ -14,7 +14,7 @@ public class FileIO {
     public void save(ArrayList<Particle> particles, ArrayList<Constraint> constraints){
         System.out.println("this should save");
         try {
-            BufferedWriter particleWriter = new BufferedWriter(new FileWriter("Week4/001.Verlet/resources/saveConstraints.txt"));
+            BufferedWriter particleWriter = new BufferedWriter(new FileWriter("Week4/001.Verlet/resources/saveParticles.txt"));
 
             for (Particle particle : particles) {
                 particleWriter.write("\n" + particle);
