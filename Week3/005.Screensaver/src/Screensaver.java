@@ -31,10 +31,18 @@ public class Screensaver extends Application {
         canvas = new ResizableCanvas(g -> draw(g), mainPane);
         mainPane.setCenter(canvas);
         FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
-        points.add(new Point(new Point2D.Double(0,0),5,5,canvas, points));
-        points.add(new Point(new Point2D.Double(50,0),-5,3,canvas, points));
-        points.add(new Point(new Point2D.Double(0,50),9,-5,canvas, points));
-        points.add(new Point(new Point2D.Double(50,50),-5,6,canvas, points));
+        points.add(new Point(new Point2D.Double((Math.random() * canvas.getWidth()),(Math.random()* canvas.getHeight())),
+                (int) (Math.random()* 7),(int) (Math.random()* 7),canvas, points));
+
+        points.add(new Point(new Point2D.Double((Math.random() * canvas.getWidth()),(Math.random()* canvas.getHeight())),
+                (int) (Math.random()* 7),(int) (Math.random()* 7),canvas, points));
+
+        points.add(new Point(new Point2D.Double(Math.random() * canvas.getWidth(),Math.random()* canvas.getHeight()),
+                (int) (Math.random()* 7),(int) (Math.random()* 7),canvas, points));
+
+        points.add(new Point(new Point2D.Double(Math.random() * canvas.getWidth(),Math.random()* canvas.getHeight()),
+                (int) (Math.random()* 7),(int) (Math.random()* 7),canvas, points));
+
         new AnimationTimer() {
             long last = -1;
 

@@ -35,7 +35,7 @@ public class Spotlight extends Application {
         mainPane.setCenter(canvas);
         FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
 
-        for (int i = 0; i < 250; i++) {
+        for (int i = 0; i < 100; i++) {
             colors.add(new Color((int)(Math.random()*255),(int)(Math.random()*255),(int)(Math.random()*255)));
             lines.add(new Line2D.Double(0,Math.random()*canvas.getHeight(),
                canvas.getWidth(),Math.random()*canvas.getHeight()));
