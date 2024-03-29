@@ -37,7 +37,7 @@ public class AngryBirds extends Application {
     private World world;
     private MousePicker mousePicker;
     private Camera camera;
-    private boolean debugSelected = true;
+    private boolean debugSelected = false;
     private BufferedImage background;
     private ArrayList<GameObject> gameObjects = new ArrayList<>();
     private double scale;
@@ -58,7 +58,7 @@ public class AngryBirds extends Application {
         mainPane.setCenter(canvas);
         FXGraphics2D g2d = new FXGraphics2D(canvas.getGraphicsContext2D());
 
-        camera = new Camera(canvas, g -> draw(g), g2d);
+        camera = new Camera(canvas, this::draw, g2d);
         mousePicker = new MousePicker(canvas);
 
         new AnimationTimer() {
