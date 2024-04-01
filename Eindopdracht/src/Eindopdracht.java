@@ -29,6 +29,7 @@ public class Eindopdracht extends Application {
     private boolean debugSelected;
     private ArrayList<GameEntity> entities;
     private Camera camera;
+    private boolean keyHeld;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -65,9 +66,15 @@ public class Eindopdracht extends Application {
 
     private void keyReleased(KeyEvent keyEvent) {
         player.keyReleased(keyEvent);
+        keyHeld = false;
     }
 
     private void keyPressed(KeyEvent keyEvent) {
+        if (keyHeld)
+            return;
+
+
+        keyHeld = true;
         player.keyPressed(keyEvent);
 
         switch (keyEvent.getCharacter().toLowerCase()){
@@ -75,12 +82,12 @@ public class Eindopdracht extends Application {
                 Body bulletBody = new Body();
                 bulletBody.addFixture(Geometry.createRectangle(0.25,0.25));
                 bulletBody.translate(new Vector2(player.getPlayerX(), player.getPlayerY()));
-                bulletBody.setMass(MassType.INFINITE);
+                bulletBody.setMass(MassType.NORMAL);
 
                 world.addBody(bulletBody);
 
                 entities.add(new Bullet(
-                        "/Fighter", 28, player.getRotation(),
+                        "/Fighter", 28, player.getAngle(),
                         1 , bulletBody, new Vector2(0,0)));
             case "p":
                 Body enemyBody;
@@ -126,6 +133,7 @@ public class Eindopdracht extends Application {
 
     public void init(){
         this.timePassed = 0.0;
+        this.keyHeld = false;
 
         Body playerBody = new Body();
         playerBody.addFixture(Geometry.createRectangle(0.4,0.4));

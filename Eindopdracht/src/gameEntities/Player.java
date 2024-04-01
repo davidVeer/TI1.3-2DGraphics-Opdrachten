@@ -17,29 +17,34 @@ public class Player implements GameEntity {
 
     //movement and location
     private boolean isMoving;
-    private double rotation;
+    private double angle;
     private boolean isRotating;
+    private CharacterDirections direction;
 
     //animations
     private ArrayList<ArrayList<BufferedImage>> animations;
     private ArrayList<BufferedImage> currentAnimation;
     private int animationFrame;
 
-    // general
-    private CharacterDirections direction;
+    // body and hitbox
     private Body playerBody;
     private double scale;
     private Vector2 offset;
+    private double rotation;
+    private final HitBoxType hitBoxType;
 
     public Player(Body body, String folderName, int spriteDimentions, double scale, Vector2 offset) {
         // general initialisation
         this.playerBody = body;
         this.scale = scale;
         this.offset = offset;
+        hitBoxType = HitBoxType.FRIENDLY;
 
         // movement and location initialisation
         this.isMoving = false;
+        this.isRotating = false;
         this.rotation = 0;
+        this.angle = 0;
 
         // animation initialisation
         this.animations = new ArrayList<>();
@@ -54,34 +59,36 @@ public class Player implements GameEntity {
         //setting animation and movement acording to direction
         switch (this.direction) {
             case FORWARD:
-                this.isMoving = true;
                 this.currentAnimation = this.animations.get(1);
                 break;
             case TURNING_LEFT:
-                this.isRotating = true;
+                this.rotation = -10;
                 break;
             case TURNING_RIGHT:
-                this.isRotating = true;
+                this.rotation = 10;
                 break;
         }
     }
 
     public void keyPressed(KeyEvent e) {
-        if (isMoving || isRotating)
+        if (isMoving)
             return;
 
         String character = e.getCharacter().toLowerCase();
         switch (character) {
             case "w":
                 System.out.println("w");
+                this.isMoving = true;
                 setDirection(CharacterDirections.FORWARD);
                 break;
             case "a":
                 System.out.println("a");
+                this.isMoving = true;
                 setDirection(CharacterDirections.TURNING_LEFT);
                 break;
             case "d":
                 System.out.println("d");
+                this.isMoving = true;
                 setDirection(CharacterDirections.TURNING_RIGHT);
                 break;
             case " ":
@@ -93,7 +100,6 @@ public class Player implements GameEntity {
 
     public void keyReleased(KeyEvent e) {
         isMoving = false;
-        isRotating = false;
     }
 
     @Override
@@ -101,32 +107,60 @@ public class Player implements GameEntity {
         //updating image
         animationFrame++;
 
-        if (!isMoving && animationFrame >= currentAnimation.size()){
+        if (!isMoving && animationFrame >= currentAnimation.size()) {
             this.currentAnimation = this.animations.get(0);
             this.animationFrame = 0;
-        }
-        else if (animationFrame >= currentAnimation.size()) {
+        } else if (animationFrame >= currentAnimation.size()) {
             animationFrame = 0;
         }
 
 
         // updating location if player is moving
         if (isMoving) {
-            playerBody.translate(
-                    0.25 * Math.cos(-rotation / 57), 0.25 * Math.sin(-rotation / 57)
-            );
-
-        } else if (isRotating)
             switch (direction) {
+                case FORWARD:
+                    playerBody.translate(
+                            0.25 * Math.cos(-angle / 57), 0.25 * Math.sin(-angle / 57)
+                    );
+                    break;
                 case TURNING_LEFT:
-                    rotation -= 10;
+                    isRotating = true;
+                    rotation -= 0.5;
+                    angle += rotation;
+                    System.out.println(rotation);
                     break;
                 case TURNING_RIGHT:
-                    rotation += 10;
+                    isRotating = true;
+                    rotation += 0.5;
+                    angle += rotation;
+                    System.out.println(rotation);
                     break;
             }
-        if (rotation >= 360)
-            rotation -= 360;
+        }
+        //making rotation stop slowly
+        else if (isRotating) {
+            switch (direction){
+                case TURNING_LEFT:
+                    rotation += 2;
+                    if (rotation >= 0) {
+                        rotation = 0;
+                        isRotating = false;
+                    }
+                    angle += rotation;
+                    break;
+                case TURNING_RIGHT:
+                    rotation -= 2;
+                    if (rotation <= 0) {
+                        rotation = 0;
+                        isRotating = false;
+                    }
+                    angle += rotation;
+                    break;
+            }
+
+        }
+        if (angle >= 360)
+            angle -= 360;
     }
 
     @Override
@@ -135,7 +169,7 @@ public class Player implements GameEntity {
         tx.translate(playerBody.getTransform().getTranslationX() * 100, playerBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
         tx.translate(offset.x, offset.y);
-        tx.rotate(Math.toRadians(this.rotation));
+        tx.rotate(Math.toRadians(this.angle));
 
         tx.translate(-currentAnimation.get(animationFrame).getWidth() / 2.0,
                 -currentAnimation.get(animationFrame).getHeight() / 2.0);
@@ -169,15 +203,21 @@ public class Player implements GameEntity {
         }
     }
 
+    @Override
+    public HitBoxType getHitBoxType() {
+        return this.hitBoxType;
+    }
+
     public double getPlayerX() {
         return playerBody.getTransform().getTranslationX();
     }
+
     public double getPlayerY() {
         return playerBody.getTransform().getTranslationY();
     }
 
-    public double getRotation() {
-        return rotation;
+    public double getAngle() {
+        return angle;
     }
 
 }

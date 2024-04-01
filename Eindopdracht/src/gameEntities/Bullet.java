@@ -6,7 +6,6 @@ import org.dyn4j.geometry.Vector2;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,17 +18,19 @@ public class Bullet
     private ArrayList<BufferedImage> animation;
     private int animationFrame;
 
-    //tansformation and location attibutes
+    //body and hitbox attributes
     private double rotation;
     private double scale;
     private Body bulletBody;
     private Vector2 offset;
+    private final HitBoxType hitBoxType;
 
     public Bullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset) {
         this.scale = scale;
         this.bulletBody = bulletBody;
         this.offset = offset;
         this.rotation = rotation;
+        this.hitBoxType = HitBoxType.FRIENDLY_BULLET;
 
         initialiseAnimations(folderName, spriteDimentions);
         this.animationFrame = 0;
@@ -70,5 +71,10 @@ public class Bullet
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public HitBoxType getHitBoxType() {
+        return null;
     }
 }
