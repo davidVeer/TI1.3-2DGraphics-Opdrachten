@@ -1,5 +1,7 @@
 package gameEntities;
 
+import gameEntities.EntityProperties.GameEntity;
+import gameEntities.EntityProperties.HitBoxType;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
 
@@ -11,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Bullet
+public class EnemyBullet
         implements GameEntity
 {
     //animation attributes
@@ -24,13 +26,16 @@ public class Bullet
     private Body bulletBody;
     private Vector2 offset;
     private final HitBoxType hitBoxType;
+    private int health;
 
-    public Bullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset) {
+    public EnemyBullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset) {
         this.scale = scale;
         this.bulletBody = bulletBody;
         this.offset = offset;
         this.rotation = rotation;
-        this.hitBoxType = HitBoxType.FRIENDLY_BULLET;
+        this.hitBoxType = HitBoxType.ENEMY_BULLET;
+        this.health = 1;
+        bulletBody.applyForce(new Vector2(100 * Math.cos(-rotation / 57),100* Math.sin(-rotation / 57)));
 
         initialiseAnimations(folderName, spriteDimentions);
         this.animationFrame = 0;
@@ -55,11 +60,6 @@ public class Bullet
         animationFrame++;
         if (animationFrame >= animation.size())
             animationFrame = 0;
-
-        bulletBody.translate(
-                0.5 * Math.cos(-rotation / 57), 0.5 * Math.sin(-rotation / 57)
-        );
-
     }
 
     @Override
@@ -74,7 +74,27 @@ public class Bullet
     }
 
     @Override
+    public void damage(int damage) {
+
+    }
+    @Override
+    public boolean checkContact(GameEntity entityToCheck) {
+        return  (this.bulletBody.isInContact(entityToCheck.getBody()) &&
+                entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY) || entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY_BULLET));
+    }
+
+    @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
     public HitBoxType getHitBoxType() {
-        return null;
+        return this.hitBoxType;
+    }
+
+    @Override
+    public Body getBody() {
+        return this.bulletBody;
     }
 }

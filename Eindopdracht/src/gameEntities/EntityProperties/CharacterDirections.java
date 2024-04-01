@@ -1,4 +1,4 @@
-package gameEntities;
+package gameEntities.EntityProperties;
 
 public enum CharacterDirections {
     TURNING_LEFT,

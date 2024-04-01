@@ -1,5 +1,6 @@
-import gameEntities.Bullet;
-import gameEntities.GameEntity;
+import gameEntities.PlayerBullet;
+import gameEntities.EnemyBomber;
+import gameEntities.EntityProperties.GameEntity;
 import gameEntities.Player;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -80,17 +81,25 @@ public class Eindopdracht extends Application {
         switch (keyEvent.getCharacter().toLowerCase()){
             case " ":
                 Body bulletBody = new Body();
-                bulletBody.addFixture(Geometry.createRectangle(0.25,0.25));
+                bulletBody.addFixture(Geometry.createRectangle(0.25, 0.25));
                 bulletBody.translate(new Vector2(player.getPlayerX(), player.getPlayerY()));
                 bulletBody.setMass(MassType.NORMAL);
 
                 world.addBody(bulletBody);
 
-                entities.add(new Bullet(
+                entities.add(new PlayerBullet(
                         "/Fighter", 28, player.getAngle(),
-                        1 , bulletBody, new Vector2(0,0)));
+                        1, bulletBody, new Vector2(0, 0)));
+                break;
             case "p":
-                Body enemyBody;
+                Body enemyBody = new Body();
+                enemyBody.addFixture(Geometry.createRectangle(1,0.5));
+                enemyBody.setMass(MassType.INFINITE);
+                enemyBody.translate(-5 + (Math.random()* 10), 4.5);
+
+                world.addBody(enemyBody);
+
+                entities.add(new EnemyBomber("/Bomber", 192, enemyBody,1, new Vector2(0,0)));
                 break;
             case "0":
                 debugSelected = !debugSelected;
@@ -100,11 +109,24 @@ public class Eindopdracht extends Application {
 
     private void update(double deltaTime) {
         timePassed += deltaTime;
+        world.update(deltaTime);
+        ArrayList<GameEntity> deadEntities = new ArrayList<>();
 
         if (timePassed >= 0.16){
             for (GameEntity entity : entities) {
                 entity.update();
+                for (GameEntity otherEntity : entities) {
+                    entity.checkContact(otherEntity);
+                }
+                if (entity.getHealth() <= 0 )
+                    deadEntities.add(entity);
             }
+
+            for (GameEntity deadEntity : deadEntities) {
+                entities.remove(deadEntity);
+                world.removeBody(deadEntity.getBody());
+            }
+
             timePassed -= 0.16;
         }
     }
@@ -140,10 +162,16 @@ public class Eindopdracht extends Application {
         playerBody.translate(new Vector2(-0.5,0.5));
         playerBody.setMass(MassType.INFINITE);
 
+       Body enemyBody = new Body();
+       enemyBody.addFixture(Geometry.createCircle(0.5));
+       enemyBody.translate(.5,.5);
+       enemyBody.setMass(MassType.NORMAL);
+
         this.world = new World();
-        world.setGravity(new Vector2(0,1.62));
+        world.setGravity(new Vector2(0,-1.62));
 
         world.addBody(playerBody);
+        world.addBody(enemyBody);
 
         player = new Player(playerBody ,"/Fighter",192, 1, new Vector2(0,0));
 
@@ -151,4 +179,11 @@ public class Eindopdracht extends Application {
         entities.add(player);
     }
 
+    public World getWorld() {
+        return world;
+    }
+
+    public ArrayList<GameEntity> getEntities() {
+        return entities;
+    }
 }

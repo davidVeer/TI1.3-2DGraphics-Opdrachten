@@ -2,7 +2,13 @@ package gameEntities;
 
 import java.awt.*;
 
+import gameEntities.EntityProperties.CharacterDirections;
+import gameEntities.EntityProperties.GameEntity;
+import gameEntities.EntityProperties.HitBoxType;
+
+
 import javafx.scene.input.KeyEvent;
+
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
 
@@ -13,7 +19,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Player implements GameEntity {
+public class Player
+        implements GameEntity
+{
 
     //movement and location
     private boolean isMoving;
@@ -32,9 +40,11 @@ public class Player implements GameEntity {
     private Vector2 offset;
     private double rotation;
     private final HitBoxType hitBoxType;
+    private int health;
 
     public Player(Body body, String folderName, int spriteDimentions, double scale, Vector2 offset) {
         // general initialisation
+        this.health = 100;
         this.playerBody = body;
         this.scale = scale;
         this.offset = offset;
@@ -99,7 +109,7 @@ public class Player implements GameEntity {
     }
 
     public void keyReleased(KeyEvent e) {
-        isMoving = false;
+        this.isMoving = false;
     }
 
     @Override
@@ -139,7 +149,7 @@ public class Player implements GameEntity {
         }
         //making rotation stop slowly
         else if (isRotating) {
-            switch (direction){
+            switch (direction) {
                 case TURNING_LEFT:
                     rotation += 2;
                     if (rotation >= 0) {
@@ -161,10 +171,12 @@ public class Player implements GameEntity {
         }
         if (angle >= 360)
             angle -= 360;
+
+        System.out.println(health);
     }
 
     @Override
-    public void draw(Graphics2D graphics2D) {
+    public void draw(Graphics2D graphics) {
         AffineTransform tx = new AffineTransform();
         tx.translate(playerBody.getTransform().getTranslationX() * 100, playerBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
@@ -174,7 +186,7 @@ public class Player implements GameEntity {
         tx.translate(-currentAnimation.get(animationFrame).getWidth() / 2.0,
                 -currentAnimation.get(animationFrame).getHeight() / 2.0);
 
-        graphics2D.drawImage(currentAnimation.get(animationFrame), tx, null);
+        graphics.drawImage(currentAnimation.get(animationFrame), tx, null);
     }
 
     @Override
@@ -204,14 +216,33 @@ public class Player implements GameEntity {
     }
 
     @Override
+    public void damage(int damage) {
+
+    }
+
+    @Override
+    public boolean checkContact(GameEntity entityToCheck) {
+        return (this.playerBody.isInContact(entityToCheck.getBody()) &&
+                entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY) || entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY_BULLET));
+    }
+
+    @Override
+    public int getHealth() {
+        return health;
+    }
+
+    @Override
     public HitBoxType getHitBoxType() {
         return this.hitBoxType;
     }
 
+    @Override
+    public Body getBody() {
+        return this.playerBody;
+    }
     public double getPlayerX() {
         return playerBody.getTransform().getTranslationX();
     }
-
     public double getPlayerY() {
         return playerBody.getTransform().getTranslationY();
     }
