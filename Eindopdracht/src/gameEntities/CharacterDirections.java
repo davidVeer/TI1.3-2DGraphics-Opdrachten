@@ -1,8 +1,7 @@
 package gameEntities;
 
 public enum CharacterDirections {
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN
+    TURNING_LEFT,
+    TURNING_RIGHT,
+    FORWARD,
 }

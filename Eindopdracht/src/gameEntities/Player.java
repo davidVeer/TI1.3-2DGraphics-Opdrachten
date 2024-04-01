@@ -1,21 +1,24 @@
 package gameEntities;
 
 import java.awt.*;
+
 import javafx.scene.input.KeyEvent;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.geometry.Vector2;
 
+import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Player implements GameEntity {
 
     //movement and location
-    private Point2D location;
-    private Point2D movementDirection;
     private boolean isMoving;
+    private double rotation;
+    private boolean isRotating;
 
     //animations
     private ArrayList<ArrayList<BufferedImage>> animations;
@@ -28,127 +31,153 @@ public class Player implements GameEntity {
     private double scale;
     private Vector2 offset;
 
-    public Player(Body body, BufferedImage spriteSheet, int spriteDimentions, double scale, Vector2 offset) {
+    public Player(Body body, String folderName, int spriteDimentions, double scale, Vector2 offset) {
         // general initialisation
         this.playerBody = body;
         this.scale = scale;
         this.offset = offset;
 
         // movement and location initialisation
-        isMoving = false;
-        this.location = new Point2D.Double(300,200);
-        movementDirection = new Point2D.Double(0,0);
+        this.isMoving = false;
+        this.rotation = 0;
 
         // animation initialisation
-        animations = new ArrayList<>();
+        this.animations = new ArrayList<>();
         this.animationFrame = 0;
-        initialiseAnimations(spriteSheet, spriteDimentions);
-        setDirection(CharacterDirections.RIGHT);
+        initialiseAnimations(folderName, spriteDimentions);
+        this.currentAnimation = animations.get(0);
     }
 
-    public void setDirection(CharacterDirections direction){
+    public void setDirection(CharacterDirections direction) {
         this.direction = direction;
 
         //setting animation and movement acording to direction
-        switch (this.direction){
-            case UP:
-                this.currentAnimation = this.animations.get(3);
-                this.movementDirection = new Point2D.Double(0,0.2);
-                break;
-            case DOWN:
-                this.currentAnimation = this.animations.get(0);
-                this.movementDirection = new Point2D.Double(0,-0.2);
-                break;
-            case LEFT:
+        switch (this.direction) {
+            case FORWARD:
+                this.isMoving = true;
                 this.currentAnimation = this.animations.get(1);
-                this.movementDirection = new Point2D.Double(-0.2,0);
                 break;
-            case RIGHT:
-                this.currentAnimation = this.animations.get(2);
-                this.movementDirection = new Point2D.Double(0.2,0);
+            case TURNING_LEFT:
+                this.isRotating = true;
                 break;
+            case TURNING_RIGHT:
+                this.isRotating = true;
+                break;
+        }
+    }
+
+    public void keyPressed(KeyEvent e) {
+        if (isMoving || isRotating)
+            return;
+
+        String character = e.getCharacter().toLowerCase();
+        switch (character) {
+            case "w":
+                System.out.println("w");
+                setDirection(CharacterDirections.FORWARD);
+                break;
+            case "a":
+                System.out.println("a");
+                setDirection(CharacterDirections.TURNING_LEFT);
+                break;
+            case "d":
+                System.out.println("d");
+                setDirection(CharacterDirections.TURNING_RIGHT);
+                break;
+            case " ":
+                currentAnimation = animations.get(2);
         }
 
         this.animationFrame = 0;
     }
 
-    public void keyPressed(KeyEvent e){
-        if (isMoving)
-            return;
-
-        isMoving = true;
-        String character = e.getCharacter().toLowerCase();
-        switch (character){
-            case "w":
-                System.out.println("w");
-                setDirection(CharacterDirections.UP);
-                break;
-            case "a":
-                System.out.println("a");
-                setDirection(CharacterDirections.LEFT);
-                break;
-            case "s":
-                System.out.println("s");
-                setDirection(CharacterDirections.DOWN);
-                break;
-            case "d":
-                System.out.println("d");
-                setDirection(CharacterDirections.RIGHT);
-                break;
-        }
-    }
-
-    public void keyReleased(KeyEvent e){
+    public void keyReleased(KeyEvent e) {
         isMoving = false;
+        isRotating = false;
     }
 
     @Override
-    public void update(){
+    public void update() {
         //updating image
-        animationFrame ++;
-        if (animationFrame > currentAnimation.size()-1){
+        animationFrame++;
+
+        if (!isMoving && animationFrame >= currentAnimation.size()){
+            this.currentAnimation = this.animations.get(0);
+            this.animationFrame = 0;
+        }
+        else if (animationFrame >= currentAnimation.size()) {
             animationFrame = 0;
         }
 
+
         // updating location if player is moving
-        if (isMoving)
+        if (isMoving) {
             playerBody.translate(
-                    playerBody.getLocalCenter().x + movementDirection.getX(),
-                    playerBody.getLocalCenter().y + movementDirection.getY()
+                    0.25 * Math.cos(-rotation / 57), 0.25 * Math.sin(-rotation / 57)
             );
+
+        } else if (isRotating)
+            switch (direction) {
+                case TURNING_LEFT:
+                    rotation -= 10;
+                    break;
+                case TURNING_RIGHT:
+                    rotation += 10;
+                    break;
+            }
+        if (rotation >= 360)
+            rotation -= 360;
     }
 
     @Override
-    public void draw(Graphics2D graphics2D){
+    public void draw(Graphics2D graphics2D) {
         AffineTransform tx = new AffineTransform();
-        tx.translate(playerBody.getTransform().getTranslationX() * 100,
-                playerBody.getTransform().getTranslationY() * 100);
+        tx.translate(playerBody.getTransform().getTranslationX() * 100, playerBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
         tx.translate(offset.x, offset.y);
+        tx.rotate(Math.toRadians(this.rotation));
 
         tx.translate(-currentAnimation.get(animationFrame).getWidth() / 2.0,
                 -currentAnimation.get(animationFrame).getHeight() / 2.0);
 
-        graphics2D.drawImage(currentAnimation.get(animationFrame), tx ,null);
+        graphics2D.drawImage(currentAnimation.get(animationFrame), tx, null);
     }
 
     @Override
-    public void initialiseAnimations(BufferedImage spriteSheet, int spriteDimentions){
+    public void initialiseAnimations(String folderName, int spriteDimentions) {
+        ArrayList<BufferedImage> spriteSheets = new ArrayList<>();
+        int horizontalImageAmount;
 
-        //determining amount of images (vertical and horizontal)
-        int horizontalImageAmount, verticalImageAmount;
-        horizontalImageAmount = spriteSheet.getWidth()/spriteDimentions;
-        verticalImageAmount = spriteSheet.getHeight()/spriteDimentions;
-
-        //adding arraylists of animationFrames to animations
-        for (int i = 0; i < verticalImageAmount; i++) {
+        try {
+            //adding animation spriteSheets
+            spriteSheets.add(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(folderName + "/Idle.png"))));
+            spriteSheets.add(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(folderName + "/Move.png"))));
+            spriteSheets.add(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(folderName + "/Attack_1.png"))));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (BufferedImage spriteSheet : spriteSheets) {
+            horizontalImageAmount = spriteSheet.getWidth() / spriteDimentions;
+            //adding arraylists of animationFrames to animations
             ArrayList<BufferedImage> tempAnimationList = new ArrayList<>();
-            for (int j = 0; j < horizontalImageAmount; j++) {
+            for (int i = 0; i < horizontalImageAmount; i++) {
                 tempAnimationList.add(spriteSheet.getSubimage(
-                        j*spriteDimentions,i*spriteDimentions,
-                        spriteDimentions,spriteDimentions));
+                        i * spriteDimentions, 0,
+                        spriteDimentions, spriteDimentions));
             }
             animations.add(tempAnimationList);
         }
     }
+
+    public double getPlayerX() {
+        return playerBody.getTransform().getTranslationX();
+    }
+    public double getPlayerY() {
+        return playerBody.getTransform().getTranslationY();
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
 }

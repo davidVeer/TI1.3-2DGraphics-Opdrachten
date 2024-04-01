@@ -1,9 +1,9 @@
+import gameEntities.Bullet;
 import gameEntities.GameEntity;
 import gameEntities.Player;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -15,13 +15,10 @@ import org.dyn4j.geometry.Vector2;
 import org.jfree.fx.FXGraphics2D;
 import org.jfree.fx.ResizableCanvas;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
+
 
 public class Eindopdracht extends Application {
 
@@ -41,12 +38,6 @@ public class Eindopdracht extends Application {
         FXGraphics2D graphics = new FXGraphics2D(canvas.getGraphicsContext2D());
         this.camera = new Camera(canvas, this::draw , graphics);
         init();
-
-        javafx.scene.control.CheckBox showDebug = new CheckBox("debug draw mode");
-        showDebug.setOnAction(e -> {
-            debugSelected = showDebug.isSelected();
-        });
-        mainPane.setTop(showDebug);
 
         new AnimationTimer() {
             long last = -1;
@@ -78,20 +69,42 @@ public class Eindopdracht extends Application {
 
     private void keyPressed(KeyEvent keyEvent) {
         player.keyPressed(keyEvent);
+
+        switch (keyEvent.getCharacter().toLowerCase()){
+            case " ":
+                Body bulletBody = new Body();
+                bulletBody.addFixture(Geometry.createRectangle(0.25,0.25));
+                bulletBody.translate(new Vector2(player.getPlayerX(), player.getPlayerY()));
+                bulletBody.setMass(MassType.INFINITE);
+
+                world.addBody(bulletBody);
+
+                entities.add(new Bullet(
+                        "/Fighter", 28, player.getRotation(),
+                        1 , bulletBody, new Vector2(0,0)));
+            case "p":
+                Body enemyBody;
+                break;
+            case "0":
+                debugSelected = !debugSelected;
+                break;
+        }
     }
 
     private void update(double deltaTime) {
         timePassed += deltaTime;
 
         if (timePassed >= 0.16){
-            player.update();
+            for (GameEntity entity : entities) {
+                entity.update();
+            }
             timePassed -= 0.16;
         }
     }
 
     private void draw(FXGraphics2D graphics) {
         graphics.transform(new AffineTransform());
-        graphics.setBackground(Color.WHITE);
+        graphics.setBackground(Color.BLACK);
         graphics.clearRect(0,0, (int) canvas.getWidth(), (int) canvas.getHeight());
         AffineTransform originalTransform = graphics.getTransform();
 
@@ -114,27 +127,17 @@ public class Eindopdracht extends Application {
     public void init(){
         this.timePassed = 0.0;
 
-
-        BufferedImage playerSpriteSheet;
-        String playerSpriteSheetFilePath = "/!$Novus-Vessel-01.png";
-
-        try {
-            playerSpriteSheet = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(playerSpriteSheetFilePath)));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         Body playerBody = new Body();
-        playerBody.addFixture(Geometry.createRectangle(0.75,0.75));
+        playerBody.addFixture(Geometry.createRectangle(0.4,0.4));
         playerBody.translate(new Vector2(-0.5,0.5));
-        playerBody.setMass(MassType.NORMAL);
+        playerBody.setMass(MassType.INFINITE);
 
         this.world = new World();
         world.setGravity(new Vector2(0,1.62));
 
         world.addBody(playerBody);
 
-        player = new Player(playerBody ,playerSpriteSheet,64, 2, new Vector2(0,0));
+        player = new Player(playerBody ,"/Fighter",192, 1, new Vector2(0,0));
 
         entities = new ArrayList<>();
         entities.add(player);
