@@ -1,3 +1,4 @@
+import gameEntities.EnemyBomber;
 import gameEntities.EntityProperties.HitBoxType;
 import gameEntities.Bullet;
 import gameEntities.EntityProperties.GameEntity;
@@ -92,7 +93,17 @@ public class Eindopdracht extends Application {
                         1, bulletBody, new Vector2(0, 0), HitBoxType.FRIENDLY));
                 break;
             case "p":
+                Body enemyBomberBody = new Body();
+                enemyBomberBody.addFixture(Geometry.createRectangle(1, 0.5));
+                enemyBomberBody.translate(new Vector2(-5 + (Math.random() * 10), 5));
+                enemyBomberBody.setMass(MassType.NORMAL);
+                enemyBomberBody.setGravityScale(0);
 
+                world.addBody(enemyBomberBody);
+
+                entities.add(new EnemyBomber(
+                        "/Bomber", 192,
+                        enemyBomberBody,1,  new Vector2(0, 0)));
                 break;
             case "0":
                 debugSelected = !debugSelected;
@@ -141,7 +152,7 @@ public class Eindopdracht extends Application {
         }
 
         if (debugSelected) {
-            graphics.setColor(Color.blue);
+            graphics.setColor(Color.white);
             DebugDraw.draw(graphics, world, 100);
         }
 
@@ -158,16 +169,35 @@ public class Eindopdracht extends Application {
         playerBody.translate(new Vector2(-0.5,0.5));
         playerBody.setMass(MassType.NORMAL);
 
-       Body enemyBody = new Body();
-       enemyBody.addFixture(Geometry.createCircle(0.5));
-       enemyBody.translate(.5,.5);
-       enemyBody.setMass(MassType.NORMAL);
+        Body wallBody1 = new Body();
+        wallBody1.addFixture(Geometry.createRectangle(0.5,20));
+        wallBody1.translate(new Vector2(-10,0));
+        wallBody1.setMass(MassType.INFINITE);
+
+        Body wallBody2 = new Body();
+        wallBody2.addFixture(Geometry.createRectangle(20,0.5));
+        wallBody2.translate(new Vector2(-0,10));
+        wallBody2.setMass(MassType.INFINITE);
+
+        Body wallBody3 = new Body();
+        wallBody3.addFixture(Geometry.createRectangle(20,0.5));
+        wallBody3.translate(new Vector2(-0,-10));
+        wallBody3.setMass(MassType.INFINITE);
+
+        Body wallBody4 = new Body();
+        wallBody4.addFixture(Geometry.createRectangle(0.5,20));
+        wallBody4.translate(new Vector2(10,0));
+        wallBody4.setMass(MassType.INFINITE);
 
         this.world = new World();
         world.setGravity(new Vector2(0,-1.62));
 
         world.addBody(playerBody);
-        world.addBody(enemyBody);
+        world.addBody(wallBody1);
+        world.addBody(wallBody2);
+        world.addBody(wallBody3);
+        world.addBody(wallBody4);
+
 
         player = new Player(playerBody ,"/Fighter",192, 1, new Vector2(0,0));
 
