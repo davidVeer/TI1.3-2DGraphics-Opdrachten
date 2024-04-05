@@ -15,5 +15,5 @@ public interface GameEntity {
 
     int getHealth();
 
-    void damage(int damage);
+    void damage();
 }

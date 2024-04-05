@@ -1,5 +1,5 @@
-import gameEntities.PlayerBullet;
-import gameEntities.EnemyBomber;
+import gameEntities.EntityProperties.HitBoxType;
+import gameEntities.Bullet;
 import gameEntities.EntityProperties.GameEntity;
 import gameEntities.Player;
 import javafx.animation.AnimationTimer;
@@ -60,7 +60,7 @@ public class Eindopdracht extends Application {
         canvas.setOnKeyReleased(this :: keyReleased);
 
         stage.setScene(new Scene(mainPane));
-        stage.setTitle("untitled astroid & defenders clone");
+        stage.setTitle("generic space game");
         stage.show();
         draw(graphics);
     }
@@ -87,19 +87,12 @@ public class Eindopdracht extends Application {
 
                 world.addBody(bulletBody);
 
-                entities.add(new PlayerBullet(
+                entities.add(new Bullet(
                         "/Fighter", 28, player.getAngle(),
-                        1, bulletBody, new Vector2(0, 0)));
+                        1, bulletBody, new Vector2(0, 0), HitBoxType.FRIENDLY));
                 break;
             case "p":
-                Body enemyBody = new Body();
-                enemyBody.addFixture(Geometry.createRectangle(1,0.5));
-                enemyBody.setMass(MassType.INFINITE);
-                enemyBody.translate(-5 + (Math.random()* 10), 4.5);
 
-                world.addBody(enemyBody);
-
-                entities.add(new EnemyBomber("/Bomber", 192, enemyBody,1, new Vector2(0,0)));
                 break;
             case "0":
                 debugSelected = !debugSelected;
@@ -116,9 +109,12 @@ public class Eindopdracht extends Application {
             for (GameEntity entity : entities) {
                 entity.update();
                 for (GameEntity otherEntity : entities) {
-                    entity.checkContact(otherEntity);
+                    if (entity.checkContact(otherEntity)){
+                        entity.damage();
+                        otherEntity.damage();
+                    }
                 }
-                if (entity.getHealth() <= 0 )
+                if (entity.getHealth() <= 0)
                     deadEntities.add(entity);
             }
 
@@ -160,7 +156,7 @@ public class Eindopdracht extends Application {
         Body playerBody = new Body();
         playerBody.addFixture(Geometry.createRectangle(0.4,0.4));
         playerBody.translate(new Vector2(-0.5,0.5));
-        playerBody.setMass(MassType.INFINITE);
+        playerBody.setMass(MassType.NORMAL);
 
        Body enemyBody = new Body();
        enemyBody.addFixture(Geometry.createCircle(0.5));
@@ -179,11 +175,4 @@ public class Eindopdracht extends Application {
         entities.add(player);
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public ArrayList<GameEntity> getEntities() {
-        return entities;
-    }
 }

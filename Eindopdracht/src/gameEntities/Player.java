@@ -10,9 +10,12 @@ import gameEntities.EntityProperties.HitBoxType;
 import javafx.scene.input.KeyEvent;
 
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.Force;
+import org.dyn4j.dynamics.Torque;
 import org.dyn4j.geometry.Vector2;
 
 import javax.imageio.ImageIO;
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -49,6 +52,7 @@ public class Player
         this.scale = scale;
         this.offset = offset;
         hitBoxType = HitBoxType.FRIENDLY;
+        playerBody.setGravityScale(0);
 
         // movement and location initialisation
         this.isMoving = false;
@@ -70,12 +74,11 @@ public class Player
         switch (this.direction) {
             case FORWARD:
                 this.currentAnimation = this.animations.get(1);
+                this.isMoving = true;
                 break;
             case TURNING_LEFT:
-                this.rotation = -10;
-                break;
             case TURNING_RIGHT:
-                this.rotation = 10;
+                this.isMoving = true;
                 break;
         }
     }
@@ -88,17 +91,14 @@ public class Player
         switch (character) {
             case "w":
                 System.out.println("w");
-                this.isMoving = true;
                 setDirection(CharacterDirections.FORWARD);
                 break;
             case "a":
                 System.out.println("a");
-                this.isMoving = true;
                 setDirection(CharacterDirections.TURNING_LEFT);
                 break;
             case "d":
                 System.out.println("d");
-                this.isMoving = true;
                 setDirection(CharacterDirections.TURNING_RIGHT);
                 break;
             case " ":
@@ -129,50 +129,20 @@ public class Player
         if (isMoving) {
             switch (direction) {
                 case FORWARD:
-                    playerBody.translate(
-                            0.25 * Math.cos(-angle / 57), 0.25 * Math.sin(-angle / 57)
-                    );
+                    playerBody.applyForce(new Force(2 * Math.cos(playerBody.getTransform().getRotation()), 2 * Math.sin(playerBody.getTransform().getRotation())));
                     break;
                 case TURNING_LEFT:
+                    playerBody.applyForce(new Vector2(0.5,0), new Vector2(0.2,-0.2));
+                    playerBody.applyForce(new Vector2(-0.5,0), new Vector2(-0.2,0.2));
                     isRotating = true;
-                    rotation -= 0.5;
-                    angle += rotation;
-                    System.out.println(rotation);
                     break;
                 case TURNING_RIGHT:
+                    playerBody.applyForce(new Vector2(-0.5,0), new Vector2(0.2,-0.2));
+                    playerBody.applyForce(new Vector2(0.5,0), new Vector2(-0.2,0.2));
                     isRotating = true;
-                    rotation += 0.5;
-                    angle += rotation;
-                    System.out.println(rotation);
                     break;
             }
         }
-        //making rotation stop slowly
-        else if (isRotating) {
-            switch (direction) {
-                case TURNING_LEFT:
-                    rotation += 2;
-                    if (rotation >= 0) {
-                        rotation = 0;
-                        isRotating = false;
-                    }
-                    angle += rotation;
-                    break;
-                case TURNING_RIGHT:
-                    rotation -= 2;
-                    if (rotation <= 0) {
-                        rotation = 0;
-                        isRotating = false;
-                    }
-                    angle += rotation;
-                    break;
-            }
-
-        }
-        if (angle >= 360)
-            angle -= 360;
-
-        System.out.println(health);
     }
 
     @Override
@@ -181,7 +151,7 @@ public class Player
         tx.translate(playerBody.getTransform().getTranslationX() * 100, playerBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
         tx.translate(offset.x, offset.y);
-        tx.rotate(Math.toRadians(this.angle));
+        tx.rotate(-playerBody.getTransform().getRotation());
 
         tx.translate(-currentAnimation.get(animationFrame).getWidth() / 2.0,
                 -currentAnimation.get(animationFrame).getHeight() / 2.0);
@@ -216,14 +186,14 @@ public class Player
     }
 
     @Override
-    public void damage(int damage) {
-
+    public void damage() {
+        this.health -= 20;
     }
 
     @Override
     public boolean checkContact(GameEntity entityToCheck) {
         return (this.playerBody.isInContact(entityToCheck.getBody()) &&
-                entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY) || entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY_BULLET));
+                (entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY)));
     }
 
     @Override
@@ -248,7 +218,7 @@ public class Player
     }
 
     public double getAngle() {
-        return angle;
+        return playerBody.getTransform().getRotation();
     }
 
 }

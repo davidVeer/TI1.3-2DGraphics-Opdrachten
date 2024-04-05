@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class EnemyBullet
+public class Bullet
         implements GameEntity
 {
     //animation attributes
@@ -28,14 +28,14 @@ public class EnemyBullet
     private final HitBoxType hitBoxType;
     private int health;
 
-    public EnemyBullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset) {
+    public Bullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset, HitBoxType hitBoxType) {
         this.scale = scale;
         this.bulletBody = bulletBody;
         this.offset = offset;
         this.rotation = rotation;
-        this.hitBoxType = HitBoxType.ENEMY_BULLET;
+        this.hitBoxType = hitBoxType;
         this.health = 1;
-        bulletBody.applyForce(new Vector2(100 * Math.cos(-rotation / 57),100* Math.sin(-rotation / 57)));
+        bulletBody.applyForce(new Vector2(100 * Math.cos(rotation),100* Math.sin(rotation)));
 
         initialiseAnimations(folderName, spriteDimentions);
         this.animationFrame = 0;
@@ -47,7 +47,7 @@ public class EnemyBullet
         tx.translate(bulletBody.getTransform().getTranslationX() * 100, bulletBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
         tx.translate(offset.x, offset.y);
-        tx.rotate(Math.toRadians(this.rotation));
+        tx.rotate(-this.rotation);
 
         tx.translate(-animation.get(animationFrame).getWidth() / 2.0,
                 -animation.get(animationFrame).getHeight() / 2.0);
@@ -74,13 +74,20 @@ public class EnemyBullet
     }
 
     @Override
-    public void damage(int damage) {
-
+    public void damage() {
+        this.health -= 1;
     }
+
     @Override
     public boolean checkContact(GameEntity entityToCheck) {
-        return  (this.bulletBody.isInContact(entityToCheck.getBody()) &&
-                entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY) || entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY_BULLET));
+        if (this.hitBoxType.equals(HitBoxType.FRIENDLY))
+            return (this.bulletBody.isInContact(entityToCheck.getBody()) &&
+                (entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY)));
+
+        else if (this.hitBoxType.equals(HitBoxType.ENEMY))
+            return (this.bulletBody.isInContact(entityToCheck.getBody()) &&
+                    (entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY)));
+        else return false;
     }
 
     @Override
