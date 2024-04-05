@@ -39,7 +39,7 @@ public class Eindopdracht extends Application {
         canvas = new ResizableCanvas(this::draw, mainPane);
         mainPane.setCenter(canvas);
         FXGraphics2D graphics = new FXGraphics2D(canvas.getGraphicsContext2D());
-        this.camera = new Camera(canvas, this::draw , graphics);
+        this.camera = new Camera(canvas, this::draw, graphics);
         init();
 
         new AnimationTimer() {
@@ -57,8 +57,8 @@ public class Eindopdracht extends Application {
         }.start();
 
         canvas.setFocusTraversable(true);
-        canvas.setOnKeyTyped(this :: keyPressed);
-        canvas.setOnKeyReleased(this :: keyReleased);
+        canvas.setOnKeyTyped(this::keyPressed);
+        canvas.setOnKeyReleased(this::keyReleased);
 
         stage.setScene(new Scene(mainPane));
         stage.setTitle("generic space game");
@@ -79,7 +79,7 @@ public class Eindopdracht extends Application {
         keyHeld = true;
         player.keyPressed(keyEvent);
 
-        switch (keyEvent.getCharacter().toLowerCase()){
+        switch (keyEvent.getCharacter().toLowerCase()) {
             case " ":
                 Body bulletBody = new Body();
                 bulletBody.addFixture(Geometry.createRectangle(0.25, 0.25));
@@ -103,7 +103,7 @@ public class Eindopdracht extends Application {
 
                 entities.add(new EnemyBomber(
                         "/Bomber", 192,
-                        enemyBomberBody,1,  new Vector2(0, 0)));
+                        enemyBomberBody, 1, new Vector2(0, 0)));
                 break;
             case "0":
                 debugSelected = !debugSelected;
@@ -112,36 +112,35 @@ public class Eindopdracht extends Application {
     }
 
     private void update(double deltaTime) {
-        timePassed += deltaTime;
         world.update(deltaTime);
         ArrayList<GameEntity> deadEntities = new ArrayList<>();
-
-        if (timePassed >= 0.16){
             for (GameEntity entity : entities) {
                 entity.update();
-                for (GameEntity otherEntity : entities) {
-                    if (entity.checkContact(otherEntity)){
-                        entity.damage();
-                        otherEntity.damage();
+                if (entity.getClass().equals(Bullet.class)) {
+                    for (Body body : world.getBodies()){
+                        if (entity.getBody().isInContact(body))
+                            entity.damage();
+                        for (GameEntity otherEntity : entities) {
+                            if (otherEntity.checkContact(entity))
+                                otherEntity.damage();
+                        }
                     }
                 }
+
+
                 if (entity.getHealth() <= 0)
                     deadEntities.add(entity);
             }
-
             for (GameEntity deadEntity : deadEntities) {
                 entities.remove(deadEntity);
                 world.removeBody(deadEntity.getBody());
             }
-
-            timePassed -= 0.16;
-        }
     }
 
     private void draw(FXGraphics2D graphics) {
         graphics.transform(new AffineTransform());
         graphics.setBackground(Color.BLACK);
-        graphics.clearRect(0,0, (int) canvas.getWidth(), (int) canvas.getHeight());
+        graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
         AffineTransform originalTransform = graphics.getTransform();
 
         graphics.setTransform(camera.getTransform((int) canvas.getWidth(), (int) canvas.getHeight()));
@@ -160,37 +159,37 @@ public class Eindopdracht extends Application {
         graphics.setTransform(originalTransform);
     }
 
-    public void init(){
+    public void init() {
         this.timePassed = 0.0;
         this.keyHeld = false;
 
         Body playerBody = new Body();
-        playerBody.addFixture(Geometry.createRectangle(0.4,0.4));
-        playerBody.translate(new Vector2(-0.5,0.5));
+        playerBody.addFixture(Geometry.createRectangle(0.4, 0.4));
+        playerBody.translate(new Vector2(-0.5, 0.5));
         playerBody.setMass(MassType.NORMAL);
 
         Body wallBody1 = new Body();
-        wallBody1.addFixture(Geometry.createRectangle(0.5,20));
-        wallBody1.translate(new Vector2(-10,0));
+        wallBody1.addFixture(Geometry.createRectangle(0.5, 20));
+        wallBody1.translate(new Vector2(-10, 0));
         wallBody1.setMass(MassType.INFINITE);
 
         Body wallBody2 = new Body();
-        wallBody2.addFixture(Geometry.createRectangle(20,0.5));
-        wallBody2.translate(new Vector2(-0,10));
+        wallBody2.addFixture(Geometry.createRectangle(20, 0.5));
+        wallBody2.translate(new Vector2(-0, 10));
         wallBody2.setMass(MassType.INFINITE);
 
         Body wallBody3 = new Body();
-        wallBody3.addFixture(Geometry.createRectangle(20,0.5));
-        wallBody3.translate(new Vector2(-0,-10));
+        wallBody3.addFixture(Geometry.createRectangle(20, 0.5));
+        wallBody3.translate(new Vector2(-0, -10));
         wallBody3.setMass(MassType.INFINITE);
 
         Body wallBody4 = new Body();
-        wallBody4.addFixture(Geometry.createRectangle(0.5,20));
-        wallBody4.translate(new Vector2(10,0));
+        wallBody4.addFixture(Geometry.createRectangle(0.5, 20));
+        wallBody4.translate(new Vector2(10, 0));
         wallBody4.setMass(MassType.INFINITE);
 
         this.world = new World();
-        world.setGravity(new Vector2(0,-1.62));
+        world.setGravity(new Vector2(0, -1.62));
 
         world.addBody(playerBody);
         world.addBody(wallBody1);
@@ -199,7 +198,7 @@ public class Eindopdracht extends Application {
         world.addBody(wallBody4);
 
 
-        player = new Player(playerBody ,"/Fighter",192, 1, new Vector2(0,0));
+        player = new Player(playerBody, "/Fighter", 192, 1, new Vector2(0, 0));
 
         entities = new ArrayList<>();
         entities.add(player);

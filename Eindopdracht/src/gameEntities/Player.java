@@ -132,13 +132,13 @@ public class Player
                     playerBody.applyForce(new Force(2 * Math.cos(playerBody.getTransform().getRotation()), 2 * Math.sin(playerBody.getTransform().getRotation())));
                     break;
                 case TURNING_LEFT:
-                    playerBody.applyForce(new Vector2(0.5,0), new Vector2(0.2,-0.2));
-                    playerBody.applyForce(new Vector2(-0.5,0), new Vector2(-0.2,0.2));
+                    playerBody.applyForce(new Vector2(0.125,0), new Vector2(0.2,-0.2));
+                    playerBody.applyForce(new Vector2(-0.125,0), new Vector2(-0.2,0.2));
                     isRotating = true;
                     break;
                 case TURNING_RIGHT:
-                    playerBody.applyForce(new Vector2(-0.5,0), new Vector2(0.2,-0.2));
-                    playerBody.applyForce(new Vector2(0.5,0), new Vector2(-0.2,0.2));
+                    playerBody.applyForce(new Vector2(-0.125,0), new Vector2(0.2,-0.2));
+                    playerBody.applyForce(new Vector2(0.125,0), new Vector2(-0.2,0.2));
                     isRotating = true;
                     break;
             }

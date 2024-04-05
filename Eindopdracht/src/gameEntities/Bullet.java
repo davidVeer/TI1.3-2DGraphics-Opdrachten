@@ -35,6 +35,7 @@ public class Bullet
         this.rotation = rotation;
         this.hitBoxType = hitBoxType;
         this.health = 1;
+        bulletBody.setGravityScale(0);
         bulletBody.applyForce(new Vector2(100 * Math.cos(rotation),100* Math.sin(rotation)));
 
         initialiseAnimations(folderName, spriteDimentions);
