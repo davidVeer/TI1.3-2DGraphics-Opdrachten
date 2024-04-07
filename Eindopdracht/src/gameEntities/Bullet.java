@@ -3,6 +3,7 @@ package gameEntities;
 import gameEntities.EntityProperties.GameEntity;
 import gameEntities.EntityProperties.HitBoxType;
 import org.dyn4j.dynamics.Body;
+import org.dyn4j.dynamics.World;
 import org.dyn4j.geometry.Vector2;
 
 import javax.imageio.ImageIO;
@@ -14,8 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Bullet
-        implements GameEntity
-{
+        implements GameEntity {
     //animation attributes
     private ArrayList<BufferedImage> animation;
     private int animationFrame;
@@ -28,15 +28,23 @@ public class Bullet
     private final HitBoxType hitBoxType;
     private int health;
 
-    public Bullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset, HitBoxType hitBoxType) {
+    //general attributes
+    private World world;
+    private ArrayList<GameEntity> entityList;
+
+    public Bullet(String folderName, int spriteDimentions, double rotation, double scale, Body bulletBody, Vector2 offset, HitBoxType hitBoxType, World world, ArrayList<GameEntity> entityList) {
         this.scale = scale;
         this.bulletBody = bulletBody;
         this.offset = offset;
         this.rotation = rotation;
         this.hitBoxType = hitBoxType;
         this.health = 1;
+
+        this.world = world;
+        this.entityList = entityList;
+
         bulletBody.setGravityScale(0);
-        bulletBody.applyForce(new Vector2(100 * Math.cos(rotation),100* Math.sin(rotation)));
+        bulletBody.applyForce(new Vector2(100 * Math.cos(rotation), 100 * Math.sin(rotation)));
 
         initialiseAnimations(folderName, spriteDimentions);
         this.animationFrame = 0;
@@ -61,6 +69,16 @@ public class Bullet
         animationFrame++;
         if (animationFrame >= animation.size())
             animationFrame = 0;
+
+        for (GameEntity otherEntity : entityList) {
+            if (otherEntity.checkContact(this))
+                otherEntity.damage();
+        }
+        for (Body body : world.getBodies()) {
+            if (bulletBody.isInContact(body))
+                damage();
+
+        }
     }
 
     @Override
@@ -83,7 +101,7 @@ public class Bullet
     public boolean checkContact(GameEntity entityToCheck) {
         if (this.hitBoxType.equals(HitBoxType.FRIENDLY))
             return (this.bulletBody.isInContact(entityToCheck.getBody()) &&
-                (entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY)));
+                    (entityToCheck.getHitBoxType().equals(HitBoxType.ENEMY)));
 
         else if (this.hitBoxType.equals(HitBoxType.ENEMY))
             return (this.bulletBody.isInContact(entityToCheck.getBody()) &&

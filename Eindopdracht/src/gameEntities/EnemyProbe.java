@@ -1,6 +1,5 @@
 package gameEntities;
 
-import gameEntities.EntityProperties.CharacterDirections;
 import gameEntities.EntityProperties.GameEntity;
 import gameEntities.EntityProperties.HitBoxType;
 import org.dyn4j.dynamics.Body;
@@ -15,10 +14,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class EnemyBomber
+public class EnemyProbe
         implements GameEntity
 {
-
 
     //movement and location
     private int movementspeed;
@@ -35,14 +33,13 @@ public class EnemyBomber
     private final HitBoxType hitBoxType;
     private int health = 100;
 
-    public EnemyBomber(String folderName, int spriteDimentions, Body enemyBody, double scale, Vector2 offset) {
-
+    public EnemyProbe(String folderName, int spriteDimentions, Body enemyBody, double scale, Vector2 offset) {
         this.enemyBody = enemyBody;
         this.scale = scale;
         this.offset = offset;
-        hitBoxType = HitBoxType.ENEMY;
-        movementspeed = 15;
-        enemyBody.applyForce(new Vector2(movementspeed,0));
+        this.hitBoxType = HitBoxType.ENEMY;
+        this.health = 100;
+
 
         // animation initialisation
         this.animations = new ArrayList<>();
@@ -75,20 +72,7 @@ public class EnemyBomber
 
     @Override
     public void update() {
-        //updating image
-        animationFrame++;
-        if (animationFrame >= currentAnimation.size()) {
-            animationFrame = 0;
-        }
 
-        if (enemyBody.getTransform().getTranslationX() <= -6) {
-            movementspeed *= -1;
-            enemyBody.applyForce(new Vector2(2*movementspeed,0));
-        }
-        if (enemyBody.getTransform().getTranslationX() >= 6) {
-            movementspeed *= -1;
-            enemyBody.applyForce(new Vector2(2*movementspeed,0));
-        }
     }
 
     @Override
@@ -118,17 +102,6 @@ public class EnemyBomber
     }
 
     @Override
-    public void damage() {
-        this.health -= 50;
-    }
-
-    @Override
-    public boolean checkContact(GameEntity entityToCheck) {
-        return (this.enemyBody.isInContact(entityToCheck.getBody()) &&
-                (entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY)));
-    }
-
-    @Override
     public HitBoxType getHitBoxType() {
         return this.hitBoxType;
     }
@@ -139,8 +112,18 @@ public class EnemyBomber
     }
 
     @Override
-    public int getHealth(){
-        return health;
+    public boolean checkContact(GameEntity entityToCheck) {
+        return (this.enemyBody.isInContact(entityToCheck.getBody()) &&
+                (entityToCheck.getHitBoxType().equals(HitBoxType.FRIENDLY)));
     }
 
+    @Override
+    public int getHealth() {
+        return 0;
+    }
+
+    @Override
+    public void damage() {
+
+    }
 }

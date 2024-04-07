@@ -11,12 +11,11 @@ import javafx.scene.input.KeyEvent;
 
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.Force;
-import org.dyn4j.dynamics.Torque;
 import org.dyn4j.geometry.Vector2;
 
 import javax.imageio.ImageIO;
-import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,14 +42,22 @@ public class Player
     private Vector2 offset;
     private double rotation;
     private final HitBoxType hitBoxType;
-    private int health;
 
-    public Player(Body body, String folderName, int spriteDimentions, double scale, Vector2 offset) {
+    //score
+    private int health;
+    private int points;
+
+    //general
+    private ArrayList<GameEntity> entities;
+
+    public Player(Body body, String folderName, int spriteDimentions, double scale, Vector2 offset, ArrayList<GameEntity> entities) {
         // general initialisation
         this.health = 100;
         this.playerBody = body;
         this.scale = scale;
         this.offset = offset;
+        this.entities = entities;
+        this.points = 0;
         hitBoxType = HitBoxType.FRIENDLY;
         playerBody.setGravityScale(0);
 
@@ -90,15 +97,12 @@ public class Player
         String character = e.getCharacter().toLowerCase();
         switch (character) {
             case "w":
-                System.out.println("w");
                 setDirection(CharacterDirections.FORWARD);
                 break;
             case "a":
-                System.out.println("a");
                 setDirection(CharacterDirections.TURNING_LEFT);
                 break;
             case "d":
-                System.out.println("d");
                 setDirection(CharacterDirections.TURNING_RIGHT);
                 break;
             case " ":
@@ -124,12 +128,16 @@ public class Player
             animationFrame = 0;
         }
 
+        for (GameEntity entity : entities) {
+            if (checkContact(entity))
+                damage();
+        }
 
         // updating location if player is moving
         if (isMoving) {
             switch (direction) {
                 case FORWARD:
-                    playerBody.applyForce(new Force(2 * Math.cos(playerBody.getTransform().getRotation()), 2 * Math.sin(playerBody.getTransform().getRotation())));
+                    playerBody.applyForce(new Force(Math.cos(playerBody.getTransform().getRotation()), Math.sin(playerBody.getTransform().getRotation())));
                     break;
                 case TURNING_LEFT:
                     playerBody.applyForce(new Vector2(0.125,0), new Vector2(0.2,-0.2));
@@ -151,7 +159,19 @@ public class Player
         tx.translate(playerBody.getTransform().getTranslationX() * 100, playerBody.getTransform().getTranslationY() * 100);
         tx.scale(scale, -scale);
         tx.translate(offset.x, offset.y);
+
+        Color healthColor;
+        if (this.health > 50)
+            healthColor = Color.green;
+        else if (this.health > 25)
+            healthColor = Color.ORANGE;
+        else healthColor = Color.RED;
+
+        graphics.setColor(healthColor);
+
+        graphics.fill(tx.createTransformedShape(new Rectangle2D.Double(25,0,100,25)));
         tx.rotate(-playerBody.getTransform().getRotation());
+
 
         tx.translate(-currentAnimation.get(animationFrame).getWidth() / 2.0,
                 -currentAnimation.get(animationFrame).getHeight() / 2.0);
@@ -187,7 +207,11 @@ public class Player
 
     @Override
     public void damage() {
-        this.health -= 20;
+        this.health -= 1;
+    }
+
+    public void updateEntities(ArrayList<GameEntity> newEntities){
+        this.entities = newEntities;
     }
 
     @Override
@@ -221,4 +245,11 @@ public class Player
         return playerBody.getTransform().getRotation();
     }
 
+    public void addPoints() {
+        this.points += 100;
+    }
+
+    public int getPoints() {
+        return points;
+    }
 }
