@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.World;
+import org.dyn4j.dynamics.joint.WeldJoint;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
 import org.dyn4j.geometry.Vector2;
@@ -47,6 +48,8 @@ public class Eindopdracht extends Application {
     double timePassed;
 
     public void init() {
+
+        //initialising general information
         this.timePassed = 0.0;
         this.keyHeld = false;
 
@@ -70,22 +73,23 @@ public class Eindopdracht extends Application {
 
         Body wallBody2 = new Body();
         wallBody2.addFixture(Geometry.createRectangle(20, 0.5));
-        wallBody2.translate(new Vector2(-0, 10));
-        wallBody2.setMass(MassType.INFINITE);
+        wallBody2.translate(new Vector2(0, 10));
+        wallBody2.setMass(MassType.NORMAL);
 
         Body wallBody3 = new Body();
         wallBody3.addFixture(Geometry.createRectangle(20, 0.5));
-        wallBody3.translate(new Vector2(-0, -10));
-        wallBody3.setMass(MassType.INFINITE);
+        wallBody3.translate(new Vector2(0, -10));
+        wallBody3.setMass(MassType.NORMAL);
 
         Body wallBody4 = new Body();
         wallBody4.addFixture(Geometry.createRectangle(0.5, 20));
         wallBody4.translate(new Vector2(10, 0));
-        wallBody4.setMass(MassType.INFINITE);
+        wallBody4.setMass(MassType.NORMAL);
 
+
+        //initialising world
         this.world = new World();
         world.setGravity(new Vector2(0, -1.62));
-
         world.addBody(playerBody);
         world.addBody(wallBody1);
         world.addBody(wallBody2);
@@ -93,6 +97,14 @@ public class Eindopdracht extends Application {
         world.addBody(wallBody4);
 
 
+        //adding weld joints so the walls stay together, (demonstrated the joints by making only one of the borders have an infinite mass)
+        world.addJoint(new WeldJoint(wallBody1,wallBody2,new Vector2(wallBody1.getTransform().getTranslationX(),wallBody1.getTransform().getTranslationY())));
+        world.addJoint(new WeldJoint(wallBody4,wallBody2,new Vector2(wallBody4.getTransform().getTranslationX(),wallBody4.getTransform().getTranslationY())));
+        world.addJoint(new WeldJoint(wallBody1,wallBody3,new Vector2(wallBody1.getTransform().getTranslationX(),wallBody1.getTransform().getTranslationY())));
+        world.addJoint(new WeldJoint(wallBody4,wallBody3,new Vector2(wallBody4.getTransform().getTranslationX(),wallBody4.getTransform().getTranslationY())));
+
+
+        //initialising the player
         player = new Player(playerBody, "/Fighter", 192, 1, new Vector2(0, 0), entities);
         playerIsAlive = true;
 
@@ -297,6 +309,8 @@ public class Eindopdracht extends Application {
             tx.translate(0, 50);
             graphics.fill(tx.createTransformedShape(instruction4));
         } else {
+
+            //death screen
             graphics.transform(new AffineTransform());
             graphics.setBackground(Color.BLACK);
             graphics.clearRect(0, 0, (int) canvas.getWidth(), (int) canvas.getHeight());
